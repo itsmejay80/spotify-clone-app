@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Footer.css";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
@@ -9,8 +9,26 @@ import VolumeDownIcon from "@material-ui/icons/VolumeDown";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import PlaylistPlayIcon from "@material-ui/icons/PlaylistPlay";
 import { Grid, Slider } from "@material-ui/core";
+import { useDataLayerValue } from "./DataLayer";
 
-export default function Footer() {
+export default function Footer({ spotify }) {
+  const [{ token, item, playing }, dispatch] = useDataLayerValue();
+
+  useEffect(() => {
+    spotify.getMyCurrentPlaybackState().then((res) => {
+      console.log(res);
+
+      dispatch({
+        type: "SET_PLAYING",
+        playing: res.is_playing,
+      });
+      dispatch({
+        type: "SET_ITEM",
+        item: res.item,
+      });
+    });
+  }, [spotify]);
+
   return (
     <div className="footer">
       <div className="footer_left">
