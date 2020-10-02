@@ -29,22 +29,95 @@ export default function Footer({ spotify }) {
     });
   }, [spotify]);
 
+  const handlePlayPause = () => {
+    if (playing) {
+      spotify.pause();
+      dispatch({
+        type: "SET_PLAYING",
+        playing: false,
+      });
+    } else {
+      spotify.play();
+      dispatch({
+        type: "SET_PLAYING",
+        playing: true,
+      });
+    }
+  };
+
+  const skipNext = () => {
+    spotify.skipToNext();
+    spotify.getMyCurrentPlayingTrack().then((res) => {
+      dispatch({
+        type: "SET_ITEM",
+        item: res.item,
+      });
+      dispatch({
+        type: "SET_PLAYING",
+        playing: true,
+      });
+    });
+  };
+
+  const skipPrevious = () => {
+    spotify.skipToPrevious();
+    spotify.getMyCurrentPlayingTrack().then((res) => {
+      dispatch({
+        type: "SET_ITEM",
+        item: res.item,
+      });
+      dispatch({
+        type: "SET_PLAYING",
+        playing: true,
+      });
+    });
+  };
+
   return (
     <div className="footer">
+      {/* Image and song details on left of footer*/}
       <div className="footer_left">
-        <img src="" alt="" className="footer_albumLogo" />
-        <div className="footer_songInfo">
-          <h4>Yeah!!</h4>
-          <p>User</p>
-        </div>
+        <img
+          src={item?.album.images[0].url}
+          alt={item?.name}
+          className="footer_albumLogo"
+        />
+        {item ? (
+          <div className="footer_songInfo">
+            <h4>{item.name}</h4>
+            <p>{item.artists.map((artist) => artist.name).join(", ")}</p>
+          </div>
+        ) : (
+          <div className="footer_songInfo">
+            <h4>No song is playing</h4>
+            <p>...</p>
+          </div>
+        )}
       </div>
+
+      {/* Play Pause Shuffle function in center of footer*/}
       <div className="footer_center">
         <ShuffleIcon className="footer_green" />
-        <SkipPreviousIcon className="footer_icon" />
-        <PlayCircleOutlineIcon fontSize="large" className="footer_icon" />
+        <SkipPreviousIcon onClick={skipNext} className="footer_icon" />
+
+        {playing ? (
+          <PlayCircleOutlineIcon
+            onCLick={handlePlayPause}
+            fontSize="large"
+            className="footer_icon"
+          />
+        ) : (
+          <PlayCircleOutlineIcon
+            onCLick={handlePlayPause}
+            fontSize="large"
+            className="footer_icon"
+          />
+        )}
         <SkipNextIcon className="footer_icon" />
         <RepeatIcon className="footer_green" />
       </div>
+
+      {/* Volume Controle and playlist icon on right side of footer */}
       <div className="footer_right">
         <Grid container spacing={2}>
           <Grid item>
